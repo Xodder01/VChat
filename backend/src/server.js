@@ -8,28 +8,32 @@ import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
 import { ENV } from "./lib/env.js";
 
-const app = express();
-const __dirname = path.resolve();
+// Import the Socket.IO-enabled app & server from socket.js
+// (socket.js creates the http.Server and attaches Socket.IO to it)
+import { app, server } from "./lib/socket.js";
 
+const __dirname = path.resolve();
 const PORT = ENV.PORT || 3000;
 
-app.use(express.json()); //req.body
+app.use(express.json({ limit: "50mb" })); // req.body (allow base64 image uploads)
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-//make ready for deployment
+// make ready for deployment
 if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
   app.get("*", (_, res) => {
-    res.send(path.join(__dirname, "../frontend", "dist", "index.html"));
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
 
-app.listen(PORT, () => {
+// Use server.listen (not app.listen) so Socket.IO works on the same server
+server.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
   connectDB();
 });
