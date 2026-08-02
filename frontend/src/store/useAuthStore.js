@@ -131,6 +131,8 @@ export const useAuthStore = create((set, get) => ({
 
     console.log("Connecting socket to:", BASE_URL);
 
+    console.log("BASE_URL =", BASE_URL);
+
     const socket = io(BASE_URL, {
       withCredentials: true,
     });
