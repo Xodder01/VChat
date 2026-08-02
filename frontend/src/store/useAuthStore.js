@@ -8,6 +8,9 @@ const BASE_URL =
     ? "http://localhost:3000"
     : "https://vchat-backend-38n4.onrender.com";
 
+console.log("MODE:", import.meta.env.MODE);
+console.log("BASE_URL:", BASE_URL);
+
 export const useAuthStore = create((set, get) => ({
   authUser: null,
   isCheckingAuth: true,
