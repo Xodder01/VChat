@@ -3,13 +3,12 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
+// In production Vite reads VITE_BACKEND_URL (set in Vercel dashboard or .env.production)
+// Falls back to the Render URL so it works even if the env var is missing
 const BASE_URL =
   import.meta.env.MODE === "development"
     ? "http://localhost:3000"
-    : "https://vchat-backend-38n4.onrender.com";
-
-console.log("MODE:", import.meta.env.MODE);
-console.log("BASE_URL:", BASE_URL);
+    : (import.meta.env.VITE_BACKEND_URL || "https://vchat-backend-38n4.onrender.com");
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -133,6 +132,7 @@ export const useAuthStore = create((set, get) => ({
 
     console.log("BASE_URL =", BASE_URL);
 
+    // io() auto-connects — do NOT call socket.connect() again or you get duplicate connections
     const socket = io(BASE_URL, {
       withCredentials: true,
     });
@@ -144,8 +144,6 @@ export const useAuthStore = create((set, get) => ({
     socket.on("connect_error", (err) => {
       console.error("Socket connection error:", err.message);
     });
-
-    socket.connect();
 
     set({ socket });
 

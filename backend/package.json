@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@arcjet/inspect": "^1.9.1",
     "@arcjet/node": "^1.9.1",

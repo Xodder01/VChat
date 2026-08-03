@@ -23,6 +23,9 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+// Health-check — Render pings GET / to verify the service is alive
+app.get("/", (req, res) => res.status(200).json({ status: "ok", service: "VChat API" }));
+
 // Use server.listen (not app.listen) so Socket.IO works on the same server
 server.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
