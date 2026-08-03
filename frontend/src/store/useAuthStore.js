@@ -71,23 +71,13 @@ export const useAuthStore = create((set, get) => ({
   loginWithGoogle: async () => {
     set({ isLoggingIn: true });
     try {
-      // Try to log in with demo google account or create it
       const googleData = {
-        fullName: "Alex Rivera",
-        email: "alex.rivera@gmail.com",
+        fullName: "Demo Google User",
+        email: `google.user.${Date.now()}@gmail.com`,
         password: "GoogleUserSecretPassword123!",
       };
 
-      let res;
-      try {
-        res = await axiosInstance.post("/auth/login", {
-          email: googleData.email,
-          password: googleData.password,
-        });
-      } catch (loginErr) {
-        // If login fails (user doesn't exist yet), sign them up automatically
-        res = await axiosInstance.post("/auth/signup", googleData);
-      }
+      const res = await axiosInstance.post("/auth/signup", googleData);
 
       set({ authUser: res.data });
       toast.success("Signed in with Google successfully!");
