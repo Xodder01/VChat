@@ -3,6 +3,10 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
 
+// CLIENT_URL can be a comma-separated list of allowed origins
+// e.g. "https://vchat.vercel.app,https://v-chat-abc123-vchat1.vercel.app"
+const allowedOrigins = (ENV.CLIENT_URL || "").split(",").map((o) => o.trim()).filter(Boolean);
+
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
@@ -17,7 +21,17 @@ const PORT = ENV.PORT || 3000;
 
 app.use(express.json({ limit: "50mb" })); // req.body (allow base64 image uploads)
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(cors({ origin: ENV.CLIENT_URL, credentials: true }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // allow requests with no origin (e.g. Render health pings, curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);

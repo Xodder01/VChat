@@ -7,9 +7,16 @@ import { socketAuthMiddleware } from "../middleware/socket.auth.middleware.js";
 const app = express();
 const server = http.createServer(app);
 
+// CLIENT_URL can be comma-separated — same logic as server.js
+const allowedOrigins = (ENV.CLIENT_URL || "").split(",").map((o) => o.trim()).filter(Boolean);
+
 const io = new Server(server, {
   cors: {
-    origin: [ENV.CLIENT_URL],
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   },
 });
